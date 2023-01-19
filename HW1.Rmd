@@ -1,8 +1,7 @@
 ## Reading data
 
-read.csv("real-estate-valuation-data-set.csv")
-
 ```{r}
-read.csv("real-estate-valuation-data-set.csv")
+df <- read.csv("real-estate-valuation-data-set.csv")
+View(df)
 ```
 
