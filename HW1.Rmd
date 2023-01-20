@@ -1,7 +1,92 @@
-## Reading data
+# Homework 1
+
+## Team 9:
+- Charlie Madison
+- Hrishi Mysore Harishkumar
+- Michelle Li
+- Qizhuang Huang
+- Shaun Pfister
+- Rodolfo Lerma
+
+## Description
+The data set presented contains information about the unit price of houses in New Taipei City, Taiwan. 
+
+- **age:** The age of the house in years
+- **distance:** The distance to the nearest Mass Rapid Transit (MRT) station from the house (in meters)
+- **convenience_stores:** The number of convenience stores near the house.
+- **unit_price:** The unit price of the house, measured in 10,000 New Taiwan Dollars/Ping (1 Ping = 3.3 m2)
+
+
+## Question 1:
+*Load the data in R and fit a simple linear regression of unit_price onto convenience_stores.*
+
+```{r}
+#Loading Libraries
+library(tidyverse)
+library(ISLR2)
+```
+
 
 ```{r}
 df <- read.csv("real-estate-valuation-data-set.csv")
-View(df)
+glimpse(df)
 ```
 
+```{r}
+head(df, 5)
+tail(df, 5)
+```
+```{r}
+#Looking at the data
+plot(unit_price ~ convenience_stores, data = df)
+```
+```{r}
+lm_fit <- lm(unit_price ~ convenience_stores, data = df)
+plot(unit_price ~ convenience_stores, data = df)
+abline(lm_fit, col = "blue", lwd = 3)
+```
+## Question 2:
+*Print the summary of the model in R. In plain English, state the interpretation of the coefficient estimate associated with the predictor convenience_stores.*
+
+```{r}
+#Summary of the Regression Model
+summary(lm_fit)
+```
+###Interpretation of the coefficients
+
+```{r}
+sprintf(
+    "We estimate that when there are no conveinence stores near the house the average price of a house to be $%.2f",lm_fit$coefficients[1] * 10000
+)
+```
+
+```{r}
+sprintf(
+    "We estimate that every unit increase in the number of convenience stores near by the home is associated with a $%.2f change in the average median house value",
+    lm_fit$coefficients[2] * 10000
+)
+```
+
+## Question 3:
+*Does the model indicate a statistically significant association between convenience_stores and unit_price? Explain.*
+
+## Question 4:
+*Create a 99% confidence interval for the coefficient associated with the predictor convenience_stores.*
+
+## Question 5:
+*Fit a multiple linear regression of unit_price onto convenience_stores and distance. Evaluate the Variance Inflation Factors for this model and state whether you have any concerns regarding collinearity problems between the two predictors.*
+
+## Question 6:
+*Print the summary of the model in R. In plain English, state the interpretation of the coefficients associated with the predictors convenience_stores and distance*
+
+## Question 7:
+*In plain English, state the interpretation of the results of the F-test for this model.*
+
+## Question 8:
+*In plain English, state the interpretation of the coefficient of determination R2 for this model (this can also be found using the summary function).*
+
+## Question 9:
+*Create a plot of unit_price vs. convenience_stores and a plot of unit_price vs. distance*
+
+## Question 10:
+*Based on these plots, do you believe the multiple linear regression model that we just built is appropriate for these data? Explain.*
