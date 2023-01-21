@@ -1,0 +1,194 @@
+# Homework 1
+
+## Team 9:
+- Charlie Madison
+- Hrishi Mysore Harishkumar
+- Michelle Li
+- Qizhuang Huang
+- Shaun Pfister
+- Rodolfo Lerma
+
+## Description
+The data set presented contains information about the unit price of houses in New Taipei City, Taiwan. 
+
+- **age:** The age of the house in years
+- **distance:** The distance to the nearest Mass Rapid Transit (MRT) station from the house (in meters)
+- **convenience_stores:** The number of convenience stores near the house.
+- **unit_price:** The unit price of the house, measured in 10,000 New Taiwan Dollars/Ping (1 Ping = 3.3 m2)
+
+
+## Question 1:
+**Load the data in R and fit a simple linear regression of unit_price onto convenience_stores.**
+
+```{r, message = FALSE}
+#Loading Libraries
+library(tidyverse)
+library(car)
+library(leaps)
+library(msm)
+```
+
+
+```{r}
+df <- read.csv("real-estate-valuation-data-set.csv")
+glimpse(df)
+```
+
+```{r}
+head(df, 5)
+tail(df, 5)
+```
+```{r}
+#Looking at unit_price vs convenience_stores
+plot(unit_price ~ convenience_stores, data = df)
+grid(nx = NULL, ny = NULL,
+     lty = 2, col = "gray", lwd = 2)
+title(main = "Unit Price Vs Convenience Stores ")
+```
+```{r}
+lm_fit <- lm(unit_price ~ convenience_stores, data = df)
+plot(unit_price ~ convenience_stores, data = df)
+abline(lm_fit, col = "blue", lwd = 3) 
+legend("topleft",legend=paste("R2 is", format(summary(lm_fit)$r.squared,digits=3)))
+grid(nx = NULL, ny = NULL,
+     lty = 2, col = "gray", lwd = 2)
+title(main = "Regression Line (Unit Price Vs Convenience Stores)")
+```
+
+## Question 2:
+**Print the summary of the model in R. In plain English, state the interpretation of the coefficient estimate associated with the predictor convenience_stores.**
+
+```{r}
+#Summary of the Regression Model
+summary(lm_fit)
+```
+
+```{r}
+sprintf(
+    "We estimate that when there are no convenience stores near the house the average price of the noted house would be $%.2f",lm_fit$coefficients[1] * 10000
+)
+```
+
+```{r}
+sprintf(
+    "We estimate that every unit increase in the number of convenience stores near the home is associated with a $%.2f change in the average median house value",
+    lm_fit$coefficients[2] * 10000
+)
+```
+
+## Question 3:
+**Does the model indicate a statistically significant association between convenience_stores and unit_price? Explain.**
+
+```{r}
+summary(lm_fit)$coefficients
+```
+
+```{r}
+sprintf(
+    "Looking at the Pvalue (%e) for the beta_1 *convenience_stores* coefficient we can see that there is a statistical association between the number of convenience stores and the price of the home in this data set.",
+    summary(lm_fit)$coefficients[2,4]
+)
+```
+```{r}
+sprintf(
+    "Also the Rsquared value is pointing in the same direction as the number of convenience stores near the house can expplain %.2f percent of the variation in the data.",
+    summary(lm_fit)$r.squared*100
+)
+```
+
+## Question 4:
+**Create a 99% confidence interval for the coefficient associated with the predictor convenience_stores.**
+
+```{r}
+# Confidence intervals.
+confint(lm_fit, level = 0.99)
+```
+
+## Question 5:
+**Fit a multiple linear regression of unit_price onto convenience_stores and distance. Evaluate the Variance Inflation Factors for this model and state whether you have any concerns regarding collinearity problems between the two predictors.**
+ 
+```{r}
+#Multi Linear Regression Model
+lm_fit_mult <- lm(unit_price ~ convenience_stores + distance, data = df)
+```
+
+```{r}
+# Collinarity.
+vif(lm_fit_mult)
+```
+
+Based on the noted values above (and both being smaller than 5) there is no concern on collinearity between these 2 predictors:
+- **distance:** The distance to the nearest Mass Rapid Transit (MRT) station from the house (in meters)
+- **convenience_stores:** The number of convenience stores near the house.
+
+## Question 6:
+**Print the summary of the model in R. In plain English, state the interpretation of the coefficients associated with the predictors convenience_stores and distance.**
+
+```{r}
+summary(lm_fit_mult)
+```
+
+```{r}
+sprintf(
+    "We estimate that every unit increase in the number of convenience stores near the home is associated with a $%.2f change in the average median house value",
+    lm_fit_mult$coefficients[2] * 10000
+)
+```
+
+```{r}
+sprintf(
+    "We estimate that every unit increase in the number of convenience stores near the home is associated with a $%.2f change in the average median house value",
+    lm_fit_mult$coefficients[2] * 10000
+)
+```
+
+## Question 7:
+**In plain English, state the interpretation of the results of the F-test for this model.**
+
+```{r}
+summary(lm_fit_mult)$fstatistic
+```
+The noted F-Test is telling us along with its p-value that the model that we have which includes 2 predictors (convenience_stores & distance) is better than a model with only the interceptor and non of the other variables.
+
+## Question 8:
+**In plain English, state the interpretation of the coefficient of determination R2 for this model (this can also be found using the summary function).**
+
+```{r}
+# between Y and Y_hat in multiple linear regression.
+cor(df$unit_price , fitted(lm_fit_mult))^2
+```
+
+## Question 9:
+**Create a plot of unit_price vs. convenience_stores and a plot of unit_price vs. distance**
+
+```{r}
+#Looking at unit_price vs convenience_stores
+plot(unit_price ~ convenience_stores, data = df)
+abline(lm_fit, col = "purple", lwd = 3)
+grid(nx = NULL, ny = NULL,
+     lty = 2, col = "gray", lwd = 2)
+title(main = "Unit Price Vs Convenience Stores ")
+```
+
+```{r}
+#Looking at unit_price vs convenience_stores
+lm_fit_1 <- lm(unit_price ~ distance, data = df)
+lm_fit_2 <- lm(unit_price ~ distance +  I(distance^2), data = df)
+plot(unit_price ~ distance, data = df)
+abline(lm_fit_1, col = "purple", lwd = 3)
+pred_points <- seq(0, 7000, by = 100)
+lines(
+    pred_points,
+    predict(lm_fit_2, data.frame(distance = pred_points)),
+    col = "blue",
+    lwd = 3
+)
+grid(nx = NULL, ny = NULL,
+     lty = 2, col = "gray", lwd = 2)
+title(main = "Unit Price Vs Distance ")
+```
+
+## Question 10:
+**Based on these plots, do you believe the multiple linear regression model that we just built is appropriate for these data? Explain.**
+
+No, it is possible to see that for the variable *distance* a quadratic representation of the data in the regression might be better to capture the variation the data and therefore it would be better to make predictions.
